@@ -1,8 +1,12 @@
-﻿namespace RedisDemo2.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace RedisDemo2.Entities;
 
 public class Telemetry
 {
-    public int Id { get; set; }
+    [Key]
+    public Guid Id { get; set; }
+
     public string DeviceIMEI { get; set; }
     public string DeviceIP { get; set; }
     public float LocationX { get; set; }

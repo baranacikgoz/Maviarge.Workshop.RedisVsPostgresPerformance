@@ -24,11 +24,9 @@ namespace RedisDemo2.Migrations
 
             modelBuilder.Entity("RedisDemo2.Entities.Telemetry", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<long>("AlarmForBeingPushedInLockMode")
                         .HasColumnType("bigint");

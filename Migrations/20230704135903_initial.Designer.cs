@@ -12,7 +12,7 @@ using RedisDemo2.Data;
 namespace RedisDemo2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230704103552_initial")]
+    [Migration("20230704135903_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -27,11 +27,9 @@ namespace RedisDemo2.Migrations
 
             modelBuilder.Entity("RedisDemo2.Entities.Telemetry", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<long>("AlarmForBeingPushedInLockMode")
                         .HasColumnType("bigint");
