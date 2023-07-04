@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RedisDemo2.Entities;
+using Workshop.RedisVsPostgresPerformance.Entities;
 
-namespace RedisDemo2.Data;
+namespace Workshop.RedisVsPostgresPerformance.Data;
 
 public class ApplicationDbContext : DbContext
 {

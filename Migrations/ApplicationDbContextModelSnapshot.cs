@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using RedisDemo2.Data;
+using Workshop.RedisVsPostgresPerformance.Data;
 
 #nullable disable
 
-namespace RedisDemo2.Migrations
+namespace Workshop.RedisVsPostgresPerformance.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -22,7 +22,7 @@ namespace RedisDemo2.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("RedisDemo2.Entities.Telemetry", b =>
+            modelBuilder.Entity("Workshop.RedisVsPostgresPerformance.Entities.Telemetry", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

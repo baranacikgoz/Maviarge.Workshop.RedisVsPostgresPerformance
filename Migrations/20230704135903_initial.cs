@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace RedisDemo2.Migrations
+namespace Workshop.RedisVsPostgresPerformance.Migrations
 {
     /// <inheritdoc />
     public partial class initial : Migration

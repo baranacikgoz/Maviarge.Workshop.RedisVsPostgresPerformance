@@ -1,14 +1,14 @@
 ﻿using Bogus;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RedisDemo2.Data;
-using RedisDemo2.Entities;
+using Workshop.RedisVsPostgresPerformance.Data;
+using Workshop.RedisVsPostgresPerformance.Entities;
 using StackExchange.Redis;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
-namespace RedisDemo2.Controllers;
+namespace Workshop.RedisVsPostgresPerformance.Controllers;
 
 [ApiController]
 [Route("[controller]")]

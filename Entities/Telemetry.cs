@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RedisDemo2.Entities;
+namespace Workshop.RedisVsPostgresPerformance.Entities;
 
 public class Telemetry
 {

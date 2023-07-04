@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using RedisDemo2.Data;
+using Workshop.RedisVsPostgresPerformance.Data;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
