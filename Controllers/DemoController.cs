@@ -38,61 +38,64 @@ public class DemoController : ControllerBase
         Stopwatch stopWatch = new Stopwatch();
         stopWatch.Start();
 
-        for (int i = 0; i < numberOfRecords; i++)
-        {
-            await _context.Telemetries.AddAsync(data);
-        }
-
+        // Bulk insert using AddRange
+        var telemetryList = Enumerable.Repeat(data, numberOfRecords).ToList();
+        await _context.Telemetries.AddRangeAsync(telemetryList);
         await _context.SaveChangesAsync();
 
-        var elapsedMillisecond = stopWatch.ElapsedMilliseconds;
+        var elapsedMilliseconds = stopWatch.ElapsedMilliseconds;
         stopWatch.Reset();
-        sb.AppendLine($"Inserting {numberOfRecords} telemetry data to database took {elapsedMillisecond} milliseconds.");
+        sb.AppendLine($"Inserting {numberOfRecords} telemetry data to database took {elapsedMilliseconds} milliseconds.");
 
         // ---------------------------------------
 
-        sb.AppendLine($"Inserting {numberOfRecords} telemetry data to redis...");
+        sb.AppendLine($"Inserting {numberOfRecords} telemetry data to Redis...");
 
         string telemetryAsJson = JsonSerializer.Serialize(data);
         stopWatch.Start();
 
-        for (int i = 0; i < numberOfRecords; i++)
-        {
-            string key = $"telemetry:{i}";
-            
-            await _redisInMemoryDatabase.StringSetAsync(key, telemetryAsJson);
-        }
+        var tasks = Enumerable.Range(0, numberOfRecords)
+            .Select(i =>
+            {
+                string key = $"telemetry:{i}";
+                return _redisInMemoryDatabase.StringSetAsync(key, telemetryAsJson);
+            })
+            .ToArray();
 
-        elapsedMillisecond = stopWatch.ElapsedMilliseconds;
+        await Task.WhenAll(tasks);
+
+        elapsedMilliseconds = stopWatch.ElapsedMilliseconds;
         stopWatch.Reset();
-
-        sb.AppendLine($"Inserting {numberOfRecords} telemetry data to redis took {elapsedMillisecond} milliseconds.");
-
+        sb.AppendLine($"Inserting {numberOfRecords} telemetry data to Redis took {elapsedMilliseconds} milliseconds.");
 
         sb.AppendLine($"Reading {numberOfRecords} telemetry data from database...");
 
         stopWatch.Start();
         await _context.Telemetries.ToListAsync();
-        elapsedMillisecond = stopWatch.ElapsedMilliseconds;
+        elapsedMilliseconds = stopWatch.ElapsedMilliseconds;
         stopWatch.Reset();
-        
-        sb.AppendLine($"Reading {numberOfRecords} telemetry data from database took {elapsedMillisecond} milliseconds.");
+
+        sb.AppendLine($"Reading {numberOfRecords} telemetry data from database took {elapsedMilliseconds} milliseconds.");
 
         // ---------------------------------------
 
-        sb.AppendLine($"Reading {numberOfRecords} telemetry data from redis...");
+        sb.AppendLine($"Reading {numberOfRecords} telemetry data from Redis...");
 
         stopWatch.Start();
-        for (int i = 0; i < numberOfRecords; i++)
-        {
-            string key = $"telemetry:{i}";
-            await _redisInMemoryDatabase.StringGetAsync(key);
-        }
+        var tasks2 = Enumerable.Range(0, numberOfRecords)
+            .Select(i =>
+            {
+                string key = $"telemetry:{i}";
+                return _redisInMemoryDatabase.StringGetAsync(key);
+            })
+            .ToArray();
 
-        elapsedMillisecond = stopWatch.ElapsedMilliseconds;
+        await Task.WhenAll(tasks);
+
+        elapsedMilliseconds = stopWatch.ElapsedMilliseconds;
         stopWatch.Reset();
 
-        sb.AppendLine($"Reading {numberOfRecords} telemetry data from redis took {elapsedMillisecond} milliseconds.");
+        sb.AppendLine($"Reading {numberOfRecords} telemetry data from Redis took {elapsedMilliseconds} milliseconds.");
 
         return sb.ToString();
     }
