@@ -47,7 +47,8 @@ public class DemoController : ControllerBase
         elapsedMilliseconds = await InsertSingleIntoRedis();
         sb.AppendLine($"Inserting single telemetry data to Redis took {elapsedMilliseconds} milliseconds.");
 
-        var singleTelemetry = telemetryList.First();
+        var randomInt = new Random().Next(1, numberOfRecordsToInsert);
+        var singleTelemetry = telemetryList.ElementAt(randomInt);
 
         elapsedMilliseconds = await ReadSingleFromDatabase(singleTelemetry);
         sb.AppendLine($"Reading single telemetry data from Postgresql took {elapsedMilliseconds} milliseconds.");

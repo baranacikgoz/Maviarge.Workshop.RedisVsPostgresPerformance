@@ -1,6 +1,15 @@
 version: '3.9'
 name: redisdemo-workshop
 services:
+    
+  performancetest-webapi:
+    build: ./
+    container_name: performancetest-webapi
+    ports:
+      - 9090:9090
+    environment:
+    - ASPNETCORE_URLS=http://+:9090
+
   postgres:
     container_name: postgres
     image: postgres:latest
