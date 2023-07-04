@@ -33,8 +33,6 @@ public class DemoController : ControllerBase
         int numberOfRecords = 10000;
         StringBuilder sb = new StringBuilder();
 
-        sb.AppendLine($"Inserting {numberOfRecords} telemetry data to database...");
-
         Stopwatch stopWatch = new Stopwatch();
         stopWatch.Start();
 
@@ -48,8 +46,6 @@ public class DemoController : ControllerBase
         sb.AppendLine($"Inserting {numberOfRecords} telemetry data to database took {elapsedMilliseconds} milliseconds.");
 
         // ---------------------------------------
-
-        sb.AppendLine($"Inserting {numberOfRecords} telemetry data to Redis...");
 
         string telemetryAsJson = JsonSerializer.Serialize(data);
         stopWatch.Start();
@@ -68,18 +64,12 @@ public class DemoController : ControllerBase
         stopWatch.Reset();
         sb.AppendLine($"Inserting {numberOfRecords} telemetry data to Redis took {elapsedMilliseconds} milliseconds.");
 
-        sb.AppendLine($"Reading {numberOfRecords} telemetry data from database...");
-
         stopWatch.Start();
         await _context.Telemetries.ToListAsync();
         elapsedMilliseconds = stopWatch.ElapsedMilliseconds;
         stopWatch.Reset();
 
         sb.AppendLine($"Reading {numberOfRecords} telemetry data from database took {elapsedMilliseconds} milliseconds.");
-
-        // ---------------------------------------
-
-        sb.AppendLine($"Reading {numberOfRecords} telemetry data from Redis...");
 
         stopWatch.Start();
         var tasks2 = Enumerable.Range(0, numberOfRecords)
@@ -96,6 +86,18 @@ public class DemoController : ControllerBase
         stopWatch.Reset();
 
         sb.AppendLine($"Reading {numberOfRecords} telemetry data from Redis took {elapsedMilliseconds} milliseconds.");
+
+        stopWatch.Start();
+        await _context.Telemetries.FindAsync(5);
+        elapsedMilliseconds = stopWatch.ElapsedMilliseconds;
+        stopWatch.Reset();
+        sb.AppendLine($"Reading single telemetry data from database took {elapsedMilliseconds} milliseconds.");
+
+        stopWatch.Start();
+        await _redisInMemoryDatabase.StringGetAsync("telemetry:5");
+        elapsedMilliseconds = stopWatch.ElapsedMilliseconds;
+        stopWatch.Reset();
+        sb.AppendLine($"Reading single telemetry data from redis took {elapsedMilliseconds} milliseconds.");
 
         return sb.ToString();
     }
