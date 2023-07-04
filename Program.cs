@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RedisDemo2.Data;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql("Server=localhost;Port=22222;Database=redisdemo;User Id=postgres;Password=postgres;Include Error Detail=true"));
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379"));
 
 var app = builder.Build();
 
