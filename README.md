@@ -1,8 +1,10 @@
 # Performance Workshop | Database vs In-Memory
-
-This repository contains the source code for a hands-on workshop that was conducted to demonstrate the speed difference between accessing data from RAM (using Redis) and Disk (using Postgresql). 
-The aim of this workshop was to provide interns with a practical understanding of how different data stores can impact application performance.
+This repository hosts the source code used in a hands-on workshop that highlighted the performance difference between a RAM-based datastore (Redis) and a disk-based datastore (PostgreSQL). The workshop aimed to equip interns with a practical understanding of how the choice of datastore can significantly impact application performance.
 
 # Overview
+During the workshop, under my guidance, the interns developed a simple .NET Core Web API application. The application performed write and read operations using both Redis and PostgreSQL, providing a tangible demonstration of the performance advantages inherent to in-memory databases like Redis compared to disk-based relational databases like PostgreSQL. We utilized electric scooter telemetry data from one of our projects, populated with bogus data using a fake data generator library.
 
-During the workshop I have leaded to interns and we implemented a simple .NET Core Web API application which performs write and read operations using both Redis and Postgresql. This hands-on approach allowed participants to see first-hand the speed advantages of an in-memory database like Redis when compared to a disk-based relational database like Postgresql.
+# Results
+![results](Resulsts/all.png)
+
+Please note, the operations were performed on a Huawei Matebook D16 i7-12700H with 16GB RAM. All three components (Web API, PostgreSQL, Redis) were running locally in Docker containers alongside numerous open browser tabs and Visual Studio.
