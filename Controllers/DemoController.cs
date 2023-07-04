@@ -38,7 +38,7 @@ public class DemoController : ControllerBase
         var elapsedMilliseconds = await InsertMultipleIntoDatabase(telemetryList);
         sb.AppendLine($"Inserting {numberOfRecordsToInsert} telemetry data to Postgresql took {elapsedMilliseconds} milliseconds.");
 
-        elapsedMilliseconds = await InsertMultipleIntoRedis(telemetryList, elapsedMilliseconds);
+        elapsedMilliseconds = await InsertMultipleIntoRedis(telemetryList);
         sb.AppendLine($"Inserting {numberOfRecordsToInsert} telemetry data to Redis took {elapsedMilliseconds} milliseconds.");
 
         elapsedMilliseconds = await InsertSingleIntoDatabase();
@@ -75,12 +75,14 @@ public class DemoController : ControllerBase
         return elapsedMilliseconds;
     }
 
-    private async Task<long> InsertMultipleIntoRedis(List<Telemetry> telemetryList, long elapsedMilliseconds)
+    private async Task<long> InsertMultipleIntoRedis(List<Telemetry> telemetryList)
     {
-        HashEntry[] hashEntries = telemetryList.Select(t => new HashEntry($"telemetry:{t.Id}", JsonSerializer.Serialize(t))).ToArray();
+        HashEntry[] hashEntries = telemetryList
+            .Select(t => new HashEntry($"telemetry:{t.Id}", JsonSerializer.Serialize(t)))
+            .ToArray();
         _stopwatch.Start();
         await _redisInMemoryDatabase.HashSetAsync("telemetry", hashEntries);
-        elapsedMilliseconds = _stopwatch.ElapsedMilliseconds;
+        var elapsedMilliseconds = _stopwatch.ElapsedMilliseconds;
         _stopwatch.Reset();
         return elapsedMilliseconds;
     }
