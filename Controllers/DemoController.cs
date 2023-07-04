@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using RedisDemo2.Data;
 using RedisDemo2.Entities;
 using StackExchange.Redis;
+using StackExchange.Redis.KeyspaceIsolation;
 using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 
 namespace RedisDemo2.Controllers;
@@ -25,50 +27,73 @@ public class DemoController : ControllerBase
         _redisInMemoryDatabase = _redisConnection.GetDatabase();
     }
 
-    [HttpPost("InsertTelemetryJson")]
-    public async Task<int> InsertTelemetryJson(Telemetry data)
+    [HttpPost("MeasurePerformance")]
+    public async Task<string> MeasurePerformanceAsync(Telemetry data)
     {
+        int numberOfRecords = 10000;
+        StringBuilder sb = new StringBuilder();
+
+        sb.AppendLine($"Inserting {numberOfRecords} telemetry data to database...");
+
         Stopwatch stopWatch = new Stopwatch();
         stopWatch.Start();
 
-        await _context.Telemetries.AddAsync(data);
+        for (int i = 0; i < numberOfRecords; i++)
+        {
+            await _context.Telemetries.AddAsync(data);
+        }
+
         await _context.SaveChangesAsync();
 
         var elapsedMillisecond = stopWatch.ElapsedMilliseconds;
         stopWatch.Reset();
-        _logger.LogInformation($"Telemetry kaydı atmak şu kadar sürdü: {elapsedMillisecond}");
-
+        sb.AppendLine($"Inserting {numberOfRecords} telemetry data to database took {elapsedMillisecond} milliseconds.");
 
         // ---------------------------------------
 
-        string telemetryId = data.Id.ToString();
-        var telemetryAsJson = JsonSerializer.Serialize(data);
+        sb.AppendLine($"Inserting {numberOfRecords} telemetry data to redis...");
 
+        string telemetryAsJson = JsonSerializer.Serialize(data);
         stopWatch.Start();
-        await _redisInMemoryDatabase.SetAddAsync(telemetryId, telemetryAsJson);
+
+        for (int i = 0; i < numberOfRecords; i++)
+        {
+            string key = $"telemetry:{i}";
+            
+            await _redisInMemoryDatabase.StringSetAsync(key, telemetryAsJson);
+        }
+
         elapsedMillisecond = stopWatch.ElapsedMilliseconds;
         stopWatch.Reset();
-        _logger.LogInformation($"Telemetry kaydını redis'e atmak şu kadar sürdü: {elapsedMillisecond}");
 
-        return data.Id;
-    }
+        sb.AppendLine($"Inserting {numberOfRecords} telemetry data to redis took {elapsedMillisecond} milliseconds.");
 
-    [HttpGet("GetTelemetryData")]
-    public async Task<List<Telemetry>> GetTelemetryJson()
-    {
-        Stopwatch stopWatch = new Stopwatch();
+
+        sb.AppendLine($"Reading {numberOfRecords} telemetry data from database...");
+
         stopWatch.Start();
-
-        List<Telemetry> telemetryList = await _context.Telemetries.ToListAsync();
-        //var telemetry1 = await _context.Telemetries.FirstOrDefaultAsync(t => t.Id == 1);
-        await _context.SaveChangesAsync();
-
-        var elapsedMillisecond = stopWatch.ElapsedMilliseconds;
+        await _context.Telemetries.ToListAsync();
+        elapsedMillisecond = stopWatch.ElapsedMilliseconds;
         stopWatch.Reset();
-        _logger.LogInformation($"Telemetry kaydını okumak şu kadar sürdü: {elapsedMillisecond}");
+        
+        sb.AppendLine($"Reading {numberOfRecords} telemetry data from database took {elapsedMillisecond} milliseconds.");
 
+        // ---------------------------------------
 
+        sb.AppendLine($"Reading {numberOfRecords} telemetry data from redis...");
 
-        return telemetryList;
+        stopWatch.Start();
+        for (int i = 0; i < numberOfRecords; i++)
+        {
+            string key = $"telemetry:{i}";
+            await _redisInMemoryDatabase.StringGetAsync(key);
+        }
+
+        elapsedMillisecond = stopWatch.ElapsedMilliseconds;
+        stopWatch.Reset();
+
+        sb.AppendLine($"Reading {numberOfRecords} telemetry data from redis took {elapsedMillisecond} milliseconds.");
+
+        return sb.ToString();
     }
 }
